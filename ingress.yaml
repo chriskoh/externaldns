@@ -1,0 +1,34 @@
+# run after rbac-role.yaml  
+# this dictates alot of fields in the annotations, as well as routing rules 
+# Annotations: https://kubernetes-sigs.github.io/aws-alb-ingress-controller/guide/ingress/annotation/   
+# apply -f ingress.yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: assets-alb
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/subnets: #subnets
+    alb.ingress.kubernetes.io/tags: Environment=dev, Name=alb-ingress-controller-test
+    alb.ingress.kubernetes.io/certificate-arn: # sets the certificate to be used
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]' # sets the listener port
+    alb.ingress.kubernetes.io/ip-address-type: dualstack
+spec:
+  rules:
+    - host: #hostname
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: assets
+              servicePort: 80
+    - host: #hostname
+      http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: assets
+              servicePort: 443
